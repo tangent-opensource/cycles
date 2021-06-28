@@ -177,6 +177,9 @@ class DeviceTask {
   bool integrator_branched;
   AdaptiveSampling adaptive_sampling;
 
+  uint* pixel_to_id;
+  int full_width, full_height;
+
  protected:
   double last_update_time;
 };

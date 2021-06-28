@@ -1099,6 +1099,8 @@ typedef struct PathState {
   int num_samples;     /* total number of times this path will be sampled */
   float branch_factor; /* number of branches in indirect paths */
 
+  int pixel_id;
+
   /* bounce counting */
   int bounce;
   int diffuse_bounce;

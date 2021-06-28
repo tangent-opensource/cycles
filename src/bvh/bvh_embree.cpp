@@ -256,6 +256,16 @@ static void rtc_filter_occluded_func_thick_curve(const RTC_NAMESPACE::RTCFilterF
   rtc_filter_occluded_func(args);
 }
 
+/* https://research.nvidia.com/publication/stratified-sampling-stochastic-transparency */
+inline float get_opacity_stratified(uint pixel_id, uint surface_id) {
+  uint x = pixel_id + surface_id;
+  x = x ^ (x * 0x6C50B47Cu);
+  x = x ^ (x * 0xB82F1E52u);
+  x = x ^ (x * 0xC7AFE638u);
+  x = x ^ (x * 0x8D22F6E6u);
+  return x * 0x1p-32;
+}
+
 static void rtc_filter_func_transparent_points(const RTC_NAMESPACE::RTCFilterFunctionNArguments *args)
 {
   const RTC_NAMESPACE::RTCRay *ray = (RTCRay *)args->ray;
@@ -275,8 +285,9 @@ static void rtc_filter_func_transparent_points(const RTC_NAMESPACE::RTCFilterFun
   const float opacity = kernel_tex_fetch(__points_opacity, opacity_offset);
 
   /* Unique random number per ray per geometry */
-  uint hash = (uint&)ctx->ps_rng_transparent;
-  const float rand_opacity = cmj_randfloat(hash, cmj_hash(object, prim));
+  const float rand_opacity = get_opacity_stratified(ctx->pixel_id, cmj_hash(object, prim));
+  // uint hash = (uint&)ctx->ps_rng_transparent;
+  // const float rand_opacity = cmj_randfloat(ctx->pixel_id, cmj_hash(object, prim));
 
   if (rand_opacity > opacity) {
     *args->valid = 0;
@@ -1202,6 +1213,7 @@ void BVHEmbree::add_points(const Object *ob, const PointCloud *pointcloud, int i
   rtcSetGeometryUserData(geom_id, (void *)prim_offset);
 
   if (!pointcloud->opacity.empty()) {
+    printf("Register function\n");
     rtcSetGeometryIntersectFilterFunction(geom_id, rtc_filter_func_transparent_points);
     rtcSetGeometryOccludedFilterFunction(geom_id, rtc_filter_occluded_func_transparent_points);
   } else {

@@ -17,7 +17,7 @@
 /* Templated common declaration part of all CPU kernels. */
 
 void KERNEL_FUNCTION_FULL_NAME(path_trace)(
-    KernelGlobals *kg, float *buffer, int sample, int x, int y, int offset, int stride);
+    KernelGlobals *kg, float *buffer, int sample, int x, int y, int offset, int stride, int pixel_id);
 
 void KERNEL_FUNCTION_FULL_NAME(convert_to_byte)(KernelGlobals *kg,
                                                 uchar4 *rgba,

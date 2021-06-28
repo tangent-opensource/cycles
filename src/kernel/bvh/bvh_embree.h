@@ -50,7 +50,7 @@ struct CCLIntersectContext {
   uint *lcg_state;
 
   /* for transparent rays */
-  float ps_rng_transparent;
+  uint pixel_id;
 
   CCLIntersectContext(KernelGlobals *kg_, RayType type_)
   {
@@ -62,7 +62,7 @@ struct CCLIntersectContext {
     local_isect = NULL;
     local_object_id = -1;
     lcg_state = NULL;
-    ps_rng_transparent = 0;
+    pixel_id = 0;
   }
 };
 

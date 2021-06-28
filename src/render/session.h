@@ -143,6 +143,8 @@ class Session {
   function<void(RenderTile &, bool)> update_render_tile_cb;
   function<void(RenderTile &)> read_bake_tile_cb;
 
+  std::vector<uint> pixel_to_id;
+
   explicit Session(const SessionParams &params);
   ~Session();
 

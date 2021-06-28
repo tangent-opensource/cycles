@@ -69,9 +69,9 @@ ccl_device_forceinline bool kernel_path_scene_intersect(KernelGlobals *kg,
     ray->t = kernel_data.background.ao_distance;
   }
 
-  // const float rand_transparency = path_state_rng_1D_hash(kg, state, state->rng_hash);
-  const float rand_transparency = path_state_rng_1D(kg, state, PRNG_UNUSED_0);
-  bool hit = scene_intersect(kg, ray, visibility, isect, rand_transparency);
+  // const float rand_transparency = path_state_rng_1D(kg, state, PRNG_UNUSED_0);
+  // const float rand_transparency = (float)rand() / RAND_MAX;
+  bool hit = scene_intersect(kg, ray, visibility, isect, state->pixel_id);
 
 #ifdef __KERNEL_DEBUG__
   if (state->flag & PATH_RAY_CAMERA) {
@@ -649,7 +649,7 @@ ccl_device_forceinline void kernel_path_integrate(KernelGlobals *kg,
 }
 
 ccl_device void kernel_path_trace(
-    KernelGlobals *kg, ccl_global float *buffer, int sample, int x, int y, int offset, int stride)
+    KernelGlobals *kg, ccl_global float *buffer, int sample, int x, int y, int offset, int stride, int pixel_id)
 {
   PROFILING_INIT(kg, PROFILING_RAY_SETUP);
 
@@ -687,6 +687,8 @@ ccl_device void kernel_path_trace(
   ShaderData *emission_sd = AS_SHADER_DATA(&emission_sd_storage);
 
   PathState state;
+  state.pixel_id = pixel_id;
+  // printf("pixel id %d\n", state.pixel_id);
   path_state_init(kg, emission_sd, &state, rng_hash, sample, &ray);
 
 #  ifdef __KERNEL_OPTIX__

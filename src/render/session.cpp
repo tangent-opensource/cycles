@@ -1012,6 +1012,72 @@ void Session::wait()
   session_thread = NULL;
 }
 
+/* Arbitrary rectangle domains
+ * https://github.com/jakubcerveny/gilbert */
+inline void gilbert_index_to_pos(std::vector<int2>& out, int x, int y, int ax, int ay, int bx, int by) {
+  const int w = abs(ax + ay);
+  const int h = abs(bx + by);
+
+#define SIGN(v) ((v) < 0 ? -1 : ((v) > 0 ? 1 : 0))
+  const int dax = SIGN(ax);
+  const int day = SIGN(ay);
+  const int dbx = SIGN(bx);
+  const int dby = SIGN(by);
+
+  if (h == 1) {
+    // printf("daxy %d %d\n", dax, day);
+    for (int i = 0; i < w; ++i) {
+      out.push_back({ x + dax * i, y + day * i });
+    }
+    return;
+  }
+  if (w == 1) {
+    // printf("daxy %d %d\n", dax, day);
+    for (int i = 0; i < h; ++i) {
+      out.push_back({ x + dbx * i, y + dby * i });
+    }
+    return;
+  }
+
+  int ax2 = ax / 2;
+  int ay2 = ay / 2;
+  int bx2 = bx / 2;
+  int by2 = by / 2;
+
+  const int w2 = abs(ax2 + ay2);
+  const int h2 = abs(bx2 + by2);
+
+  if (2*w > 3*h) {
+    if ((w2 % 2) && (w > 2)) {
+      ax2 += dax;
+      ay2 += day;
+    }
+
+    gilbert_index_to_pos(out, x, y, ax2, ay2, bx, by);
+    gilbert_index_to_pos(out, x + ax2, y + ay2, ax - ax2, ay - ay2, bx, by);
+  } else {
+    if ((h2 % 2) && (h > 2)) {
+      bx2 += dbx;
+      by2 += dby;
+    }
+
+    gilbert_index_to_pos(out, x, y, bx2, by2, ax2, ay2);
+    gilbert_index_to_pos(out, x + bx2, y + by2, ax, ay, bx - bx2, by - by2);
+    gilbert_index_to_pos(out, 
+    x + (ax - dax) + (bx2 - dbx), 
+    y + (ay - day) + (by2 - dby),
+    -bx2, -by2, -(ax-ax2), -(ay-ay2));
+  }
+}
+
+inline void gilbert_index_to_pos(std::vector<int2>& out, int w, int h) {
+  if (w >= h) {
+    gilbert_index_to_pos(out, 0, 0, w, 0, 0, h);
+  } else {
+    gilbert_index_to_pos(out, 0, 0, 0, h, w, 0);
+  }
+}
+
 bool Session::update_scene()
 {
   thread_scoped_lock scene_lock(scene->mutex);
@@ -1044,6 +1110,24 @@ bool Session::update_scene()
       integrator->tag_update(scene);
     }
   }
+
+  printf("Session update scene %d %d\n", width, height);
+  std::vector<int2> ids;
+  gilbert_index_to_pos(ids, width, height);
+
+  const int n_pixels = width * height;
+  assert((size_t)n_pixels == ids.size());
+  pixel_to_id.clear();;
+  pixel_to_id.resize(n_pixels);
+  
+  for (int i = 0; i < n_pixels; ++i) {
+    const int pixel_idx = ids[i].y * width + ids[i].x;
+    assert(pixel_idx < n_pixels);
+    pixel_to_id[pixel_idx] = i;
+  }
+
+  printf("ids %d pixels %d\n", ids.size(), width, height);
+
 
   /* update scene */
   if (scene->need_update()) {
@@ -1199,7 +1283,15 @@ void Session::render(bool need_denoise)
   }
 
   /* Add path trace task. */
+  printf("Add path trace task\n");
+  int width = tile_manager.state.buffer.full_width;
+  int height = tile_manager.state.buffer.full_height;
+  printf("%d %d\n", width, height);
   DeviceTask task(DeviceTask::RENDER);
+
+  task.pixel_to_id = pixel_to_id.data();
+  task.full_width = tile_manager.state.buffer.width;
+  task.full_height = tile_manager.state.buffer.height;
 
   task.acquire_tile = function_bind(&Session::acquire_tile, this, _2, _1, _3);
   task.release_tile = function_bind(&Session::release_tile, this, _1, need_denoise);

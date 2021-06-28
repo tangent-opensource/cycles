@@ -155,7 +155,7 @@ ccl_device_intersect bool scene_intersect(KernelGlobals *kg,
                                           const Ray *ray,
                                           const uint visibility,
                                           Intersection *isect,
-                                          float ps_rng = 0.0f)
+                                          uint pixel_id = 0)
 {
   PROFILING_INIT(kg, PROFILING_INTERSECT);
 
@@ -203,7 +203,7 @@ ccl_device_intersect bool scene_intersect(KernelGlobals *kg,
     isect->t = ray->t;
     CCLIntersectContext ctx(kg, CCLIntersectContext::RAY_REGULAR);
     IntersectContext rtc_ctx(&ctx);
-    ctx.ps_rng_transparent = ps_rng;
+    ctx.pixel_id = pixel_id;
     RTC_NAMESPACE::RTCRayHit ray_hit;
     kernel_embree_setup_rayhit(*ray, ray_hit, visibility);
     rtcIntersect1(kernel_data.bvh.scene, &rtc_ctx.context, &ray_hit);

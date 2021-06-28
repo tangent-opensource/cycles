@@ -192,7 +192,7 @@ class CPUDevice : public Device {
 
   DeviceRequestedFeatures requested_features;
 
-  KernelFunctions<void (*)(KernelGlobals *, float *, int, int, int, int, int)> path_trace_kernel;
+  KernelFunctions<void (*)(KernelGlobals *, float *, int, int, int, int, int, int)> path_trace_kernel;
   KernelFunctions<void (*)(KernelGlobals *, uchar4 *, float *, float, int, int, int, int)>
       convert_to_half_float_kernel;
   KernelFunctions<void (*)(KernelGlobals *, uchar4 *, float *, float, int, int, int, int)>
@@ -903,6 +903,17 @@ class CPUDevice : public Device {
     }
   }
 
+  /* Base two radical inverse
+   * https://www.pbr-book.org/3ed-2018/Sampling_and_Reconstruction/The_Halton_Sampler */
+  inline uint reverse_bits_32(uint n) {
+      n = (n << 16) | (n >> 16);
+      n = ((n & 0x00ff00ff) << 8) | ((n & 0xff00ff00) >> 8);
+      n = ((n & 0x0f0f0f0f) << 4) | ((n & 0xf0f0f0f0) >> 4);
+      n = ((n & 0x33333333) << 2) | ((n & 0xcccccccc) >> 2);
+      n = ((n & 0x55555555) << 1) | ((n & 0xaaaaaaaa) >> 1);
+      return n;
+  }
+
   void render(DeviceTask &task, RenderTile &tile, KernelGlobals *kg)
   {
     const bool use_coverage = kernel_data.film.cryptomatte_passes & CRYPT_ACCURATE;
@@ -921,6 +932,9 @@ class CPUDevice : public Device {
     /* Needed for Embree. */
     SIMD_SET_FLUSH_TO_ZERO;
 
+    // printf("path trace %d %d %d %d\n", tile.x, tile.y, tile.w, tile.h);
+    // printf("path trace %p %d %d\n", task.pixel_to_id, task.full_width, task.full_height);
+
     for (int sample = start_sample; sample < end_sample; sample++) {
       if (task.get_cancel() || task_pool.canceled()) {
         if (task.need_finish_queue == false)
@@ -933,7 +947,8 @@ class CPUDevice : public Device {
             if (use_coverage) {
               coverage.init_pixel(x, y);
             }
-            path_trace_kernel()(kg, render_buffer, sample, x, y, tile.offset, tile.stride);
+            const uint pixel_id = reverse_bits_32(sample + task.pixel_to_id[y * task.full_width + x] * (end_sample - start_sample));
+            path_trace_kernel()(kg, render_buffer, sample, x, y, tile.offset, tile.stride, pixel_id);
           }
         }
       }

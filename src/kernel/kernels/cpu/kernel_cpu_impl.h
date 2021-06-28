@@ -81,7 +81,7 @@ CCL_NAMESPACE_BEGIN
 /* Path Tracing */
 
 void KERNEL_FUNCTION_FULL_NAME(path_trace)(
-    KernelGlobals *kg, float *buffer, int sample, int x, int y, int offset, int stride)
+    KernelGlobals *kg, float *buffer, int sample, int x, int y, int offset, int stride, int pixel_id)
 {
 #  ifdef KERNEL_STUB
   STUB_ASSERT(KERNEL_ARCH, path_trace);
@@ -93,7 +93,7 @@ void KERNEL_FUNCTION_FULL_NAME(path_trace)(
   else
 #    endif
   {
-    kernel_path_trace(kg, buffer, sample, x, y, offset, stride);
+    kernel_path_trace(kg, buffer, sample, x, y, offset, stride, pixel_id);
   }
 #  endif /* KERNEL_STUB */
 }
