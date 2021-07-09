@@ -2304,7 +2304,7 @@ NODE_DEFINE(AnisotropicBsdfNode)
   static NodeEnum distribution_enum;
   distribution_enum.insert("beckmann", CLOSURE_BSDF_MICROFACET_BECKMANN_ID);
   distribution_enum.insert("GGX", CLOSURE_BSDF_MICROFACET_GGX_ID);
-  distribution_enum.insert("Multiscatter GGX", CLOSURE_BSDF_MICROFACET_MULTI_GGX_ID);
+  distribution_enum.insert("Multiscatter_GGX", CLOSURE_BSDF_MICROFACET_MULTI_GGX_ID);
   distribution_enum.insert("ashikhmin_shirley", CLOSURE_BSDF_ASHIKHMIN_SHIRLEY_ID);
   SOCKET_ENUM(distribution, "Distribution", distribution_enum, CLOSURE_BSDF_MICROFACET_GGX_ID);
 
@@ -2368,7 +2368,7 @@ NODE_DEFINE(GlossyBsdfNode)
   distribution_enum.insert("beckmann", CLOSURE_BSDF_MICROFACET_BECKMANN_ID);
   distribution_enum.insert("GGX", CLOSURE_BSDF_MICROFACET_GGX_ID);
   distribution_enum.insert("ashikhmin_shirley", CLOSURE_BSDF_ASHIKHMIN_SHIRLEY_ID);
-  distribution_enum.insert("Multiscatter GGX", CLOSURE_BSDF_MICROFACET_MULTI_GGX_ID);
+  distribution_enum.insert("Multiscatter_GGX", CLOSURE_BSDF_MICROFACET_MULTI_GGX_ID);
   SOCKET_ENUM(distribution, "Distribution", distribution_enum, CLOSURE_BSDF_MICROFACET_GGX_ID);
   SOCKET_IN_FLOAT(roughness, "Roughness", 0.5f);
 
@@ -2459,7 +2459,7 @@ NODE_DEFINE(GlassBsdfNode)
   distribution_enum.insert("sharp", CLOSURE_BSDF_SHARP_GLASS_ID);
   distribution_enum.insert("beckmann", CLOSURE_BSDF_MICROFACET_BECKMANN_GLASS_ID);
   distribution_enum.insert("GGX", CLOSURE_BSDF_MICROFACET_GGX_GLASS_ID);
-  distribution_enum.insert("Multiscatter GGX", CLOSURE_BSDF_MICROFACET_MULTI_GGX_GLASS_ID);
+  distribution_enum.insert("Multiscatter_GGX", CLOSURE_BSDF_MICROFACET_MULTI_GGX_GLASS_ID);
   SOCKET_ENUM(
       distribution, "Distribution", distribution_enum, CLOSURE_BSDF_MICROFACET_GGX_GLASS_ID);
   SOCKET_IN_FLOAT(roughness, "Roughness", 0.0f);
@@ -2738,7 +2738,7 @@ NODE_DEFINE(PrincipledBsdfNode)
 
   static NodeEnum distribution_enum;
   distribution_enum.insert("GGX", CLOSURE_BSDF_MICROFACET_GGX_GLASS_ID);
-  distribution_enum.insert("Multiscatter GGX", CLOSURE_BSDF_MICROFACET_MULTI_GGX_GLASS_ID);
+  distribution_enum.insert("Multiscatter_GGX", CLOSURE_BSDF_MICROFACET_MULTI_GGX_GLASS_ID);
   SOCKET_ENUM(
       distribution, "Distribution", distribution_enum, CLOSURE_BSDF_MICROFACET_MULTI_GGX_GLASS_ID);
 
@@ -3490,9 +3490,9 @@ NODE_DEFINE(PrincipledHairBsdfNode)
 
   /* Color parametrization specified as enum. */
   static NodeEnum parametrization_enum;
-  parametrization_enum.insert("Direct coloring", NODE_PRINCIPLED_HAIR_REFLECTANCE);
-  parametrization_enum.insert("Melanin concentration", NODE_PRINCIPLED_HAIR_PIGMENT_CONCENTRATION);
-  parametrization_enum.insert("Absorption coefficient", NODE_PRINCIPLED_HAIR_DIRECT_ABSORPTION);
+  parametrization_enum.insert("Direct_coloring", NODE_PRINCIPLED_HAIR_REFLECTANCE);
+  parametrization_enum.insert("Melanin_concentration", NODE_PRINCIPLED_HAIR_PIGMENT_CONCENTRATION);
+  parametrization_enum.insert("Absorption_coefficient", NODE_PRINCIPLED_HAIR_DIRECT_ABSORPTION);
   SOCKET_ENUM(
       parametrization, "Parametrization", parametrization_enum, NODE_PRINCIPLED_HAIR_REFLECTANCE);
 
