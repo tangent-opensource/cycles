@@ -59,9 +59,9 @@ class PointCloud : public Geometry {
   };
 
   NODE_SOCKET_API(PointCloudPointStyle, point_style);
-  NODE_SOCKET_API(array<float3>, points);
-  NODE_SOCKET_API(array<float>, radius);
-  NODE_SOCKET_API(array<int>, shader);
+  NODE_SOCKET_API_ARRAY(array<float3>, points);
+  NODE_SOCKET_API_ARRAY(array<float>, radius);
+  NODE_SOCKET_API_ARRAY(array<int>, shader);
 
   /* Constructor/Destructor */
   PointCloud();
