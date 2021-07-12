@@ -51,6 +51,7 @@ class VDBImageLoader : public ImageLoader {
 
 #ifdef WITH_OPENVDB
   openvdb::GridBase::ConstPtr get_grid();
+  void set_grid(openvdb::GridBase::ConstPtr other_grid);
 #endif
 
  protected:

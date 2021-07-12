@@ -528,6 +528,9 @@ ccl_device_noinline void svm_eval_nodes(KernelGlobals *kg,
       case NODE_TEX_VOXEL:
         svm_node_tex_voxel(kg, sd, stack, node, &offset);
         break;
+      case NODE_TEX_VOLUME:
+        svm_node_tex_volume(kg, sd, stack, node);
+        break;
 #  endif /* NODES_FEATURE(NODE_FEATURE_VOLUME) */
       case NODE_AOV_START:
         if (!svm_node_aov_check(state, buffer)) {

@@ -281,6 +281,12 @@ openvdb::GridBase::ConstPtr VDBImageLoader::get_grid()
 {
   return grid;
 }
+
+void VDBImageLoader::set_grid(openvdb::GridBase::ConstPtr other_grid)
+{
+  this->grid = other_grid;
+}
+
 #endif
 
 CCL_NAMESPACE_END

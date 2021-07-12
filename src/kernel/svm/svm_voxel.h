@@ -49,4 +49,22 @@ ccl_device void svm_node_tex_voxel(
     stack_store_float3(stack, color_out_offset, make_float3(r.x, r.y, r.z));
 }
 
+ccl_device void svm_node_tex_volume(KernelGlobals *kg, ShaderData *sd, float *stack, uint4 node)
+{
+  uint co_offset, vector_out_offset;
+  svm_unpack_node_uchar2(node.z, &co_offset, &vector_out_offset);
+
+#ifdef __VOLUME__
+  int id = node.y;
+  float3 co = stack_load_float3(stack, co_offset);
+  float4 r = kernel_tex_image_interp_3d(kg, id, co, INTERPOLATION_NONE);
+#else
+  float4 r = make_float4(0.0f, 0.0f, 0.0f, 0.0f);
+#endif
+
+  if (stack_valid(vector_out_offset)) {
+    stack_store_float3(stack, vector_out_offset, make_float3(r.x, r.y, r.z));
+  }
+}
+
 CCL_NAMESPACE_END
